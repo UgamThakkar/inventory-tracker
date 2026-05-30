@@ -23,10 +23,10 @@ public class Inventory {
     private Product product;
 
     @Column(name = "available_quantity", nullable = false)
-    private Integer availableQuantity;
+    private Integer availableQuantity = 0;
 
     @Column(name = "reserved_quantity", nullable = false)
-    private Integer reservedQuantity;
+    private Integer reservedQuantity = 0;
 
     @Column(name="warehouse_location", length=100)
     private String warehouseLocation;

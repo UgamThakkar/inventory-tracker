@@ -1,0 +1,9 @@
+### Test Case 1: Deduct Stock Successfully (Valid Request)
+
+POST http://localhost:8080/api/inventory/deduct?sku=TECH-LAP-001&quantity=5
+
+Accept: application/json
+
+### Test Case 2: Insufficient Stock Exception (Triggers Validation Rules)
+POST http://localhost:8080/api/inventory/deduct?sku=TECH-LAP-001&quantity=100
+Accept: application/json
