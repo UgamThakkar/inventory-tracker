@@ -1,5 +1,6 @@
 package com.company.inventory.inventory;
 
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,19 +15,8 @@ public class InventoryController {
     }
 
     @PostMapping("/deduct")
-    public ResponseEntity<String> deductInventory(@RequestParam String sku, @RequestParam int quantity){
-
-        try{
-            boolean success = inventoryService.deductStock(sku, quantity);
-
-            if(success){
-                return ResponseEntity.ok("Stock Deducted Successfully for SKU:" + sku);
-            }else{
-                return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Product or Inventory record not found for SKU: " + sku);
-            }
-        }catch (IllegalArgumentException | IllegalStateException e){
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<String> deductStock(@Valid @RequestBody InventoryRequestDTO request){
+        inventoryService.deductStock(request.getSku(), request.getQuantity());
+        return ResponseEntity.ok("Stock deducted Successfully for SKU: " + request.getSku());
     }
 }
