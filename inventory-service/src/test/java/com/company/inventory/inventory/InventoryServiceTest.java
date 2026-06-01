@@ -57,19 +57,15 @@ public class InventoryServiceTest {
 
     @Test
     void deductStock_InsufficientStock_ThrowsException() {
-        // Arrange: Mock the setup, but this time we want to try deducting 100 units (only 50 available)
         when(productRepository.findBySku("TECH-LAP-001")).thenReturn(Optional.of(testProduct));
         when(inventoryRepository.findByProduct(testProduct)).thenReturn(Optional.of(testInventory));
 
-        // Act & Assert: Verify that our custom guard logic catches this and throws a RuntimeException
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             inventoryService.deductStock("TECH-LAP-001", 100);
         });
 
-        // Assert: Verify the error message matches our business rule exactly
         assertEquals("Insufficient stock available for SKU: TECH-LAP-001", exception.getMessage());
 
-        // Verify: The save method should NEVER have been called because the exception blocked it
         verify(inventoryRepository, never()).save(any(Inventory.class));
     }
 }
