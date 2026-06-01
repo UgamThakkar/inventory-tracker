@@ -45,20 +45,18 @@ public class InventoryServiceTest {
 
     @Test
     void deductStock_Success(){
-        when(ProductRepository.findBySku("TECH-LAP-001")).thenReturn(Optional.of(testProduct));
-        when(inventoryRepository.findByProduct(testProduct)).thenReturn(Optional.of(testInventory));
+        when(inventoryRepository.findByProductSkuWithLock("TECH-LAP-001")).thenReturn(Optional.of(testInventory));
 
         inventoryService.deductStock("TECH-LAP-001", 5);
 
         assertEquals(45, testInventory.getAvailableQuantity());
 
-        verify(inventoryRepository, times(1).save(testInventory));
+        verify(inventoryRepository, times(1)).save(testInventory);
     }
 
     @Test
     void deductStock_InsufficientStock_ThrowsException() {
-        when(productRepository.findBySku("TECH-LAP-001")).thenReturn(Optional.of(testProduct));
-        when(inventoryRepository.findByProduct(testProduct)).thenReturn(Optional.of(testInventory));
+        when(inventoryRepository.findByProductSkuWithLock("TECH-LAP-001")).thenReturn(Optional.of(testInventory));
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> {
             inventoryService.deductStock("TECH-LAP-001", 100);
