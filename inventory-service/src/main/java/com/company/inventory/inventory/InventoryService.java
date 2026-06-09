@@ -14,26 +14,16 @@ public class InventoryService {
     }
 
     @Transactional
-    public boolean deductStock(String sku, int quantityToDeduct){
-        if(quantityToDeduct<=0){
-            throw new IllegalArgumentException("Deduction Quantity must be greater than one");
+    public void deductStock(String sku, Integer quantity) {
+        // Call the custom query that locks the row on disk right at the start of the transaction
+        Inventory inventory = inventoryRepository.findByProductSkuWithLock(sku)
+                .orElseThrow(() -> new RuntimeException("Inventory records missing for item: " + sku));
+
+        if (inventory.getAvailableQuantity() < quantity) {
+            throw new RuntimeException("Insufficient stock available for SKU: " + sku);
         }
 
-        Optional<Inventory> inventoryOPT = inventoryRepository.findByProductSkuWithLock(sku);
-
-        if(inventoryOPT.isEmpty()){
-            return false;
-        }
-
-        Inventory inventory = inventoryOPT.get();
-
-        if(inventory.getAvailableQuantity() < quantityToDeduct){
-            throw new IllegalStateException("Insufficient stock available for SKU:" + sku);
-        }
-
-        inventory.setAvailableQuantity(inventory.getAvailableQuantity() - quantityToDeduct);
-
+        inventory.setAvailableQuantity(inventory.getAvailableQuantity() - quantity);
         inventoryRepository.save(inventory);
-        return true;
     }
 }
